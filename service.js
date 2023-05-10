@@ -4,6 +4,7 @@ const path = "./storage/environment.json";
 
 function getAllEnvironment() {
   const data = JSON.parse(fs.readFileSync(path));
+
   return data;
 }
 
@@ -11,11 +12,16 @@ function getEnvironmentById(id) {
   const data = JSON.parse(fs.readFileSync(path));
 
   const filtered = data.filter((el) => el.id == id);
+  if (!filtered.length) throw new Error("empty");
+
   return filtered;
 }
 
 function createEnvironment(label, category, priority) {
   const data = JSON.parse(fs.readFileSync(path));
+
+  const filtered = data.filter((el) => el.label == label);
+  if (filtered.length > 0) throw new Error("this label already exists");
 
   const item = {
     id: label.toLowerCase(),
@@ -34,10 +40,10 @@ function updateEnvironment(id, label, category, priority) {
   const data = JSON.parse(fs.readFileSync(path));
 
   const filtered = data.filter((el) => el.id != id);
-  if (filtered.length == data.length) return "id not found";
+  if (filtered.length == data.length) throw new Error("id not found");
 
   const item = {
-    id: label.toLowerCase(),
+    id: id,
     label: label,
     category: category,
     priority: priority,
@@ -53,7 +59,8 @@ function deleteEnvironment(id) {
   const data = JSON.parse(fs.readFileSync(path));
 
   const filtered = data.filter((el) => el.id != id);
-  if (filtered.length == data.length) return "id not found";
+  if (filtered.length == data.length) throw new Error("id not found");
+
   fs.writeFileSync(path, JSON.stringify(filtered));
   return filtered;
 }
